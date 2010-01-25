@@ -15,9 +15,14 @@
 (defmulti write-session
   "Write out a session map and return a key that can be used to read the
   session, given the map of options passed to the wrap-session middleware.
-  If the session map is nil, the session should be deleted. The dispatch
-  function is (:store options)."
+  The dispatch function is (:store options)."
   (fn [session options] (:store options))
+  :default :memory)
+
+(defmulti delete-session
+  "Given a session key, remove the associated session entirely from storage
+  (if possible), and either return a new session key or nil."
+  (fn [session-key options] (:store options))
   :default :memory)
 
 ;; Default in-memory session storage
@@ -33,8 +38,15 @@
 
 (defmethod write-session :memory
   [session _]
-  (swap! memory-sessions assoc (::id session) session)
+  (if session
+    (swap! memory-sessions assoc (::id session) session)
+    (swap! memory-sessions dissoc (::id session)))
   (::id session))
+
+(defmethod delete-session :memory
+  [session-key _]
+  (swap! memory-sessions dissoc session-key)
+  nil)
 
 ;; Main middleware function
 
@@ -53,7 +65,9 @@
                 session  (atom (read-session session-key options))
                 request  (assoc request :session session)
                 response (handler request)
-                new-session-key (write-session @session options)]
+                new-session-key (if @session
+                                  (write-session @session options)
+                                  (delete-session session-key options))]
               (if (not= session-key new-session-key)
                 (assoc response :cookies {cookie new-session-key})
                 response)))))))
