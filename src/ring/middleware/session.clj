@@ -38,9 +38,7 @@
 
 (defmethod write-session :memory
   [session _]
-  (if session
-    (swap! memory-sessions assoc (::id session) session)
-    (swap! memory-sessions dissoc (::id session)))
+  (swap! memory-sessions assoc (::id session) session)
   (::id session))
 
 (defmethod delete-session :memory
