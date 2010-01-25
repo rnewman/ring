@@ -53,5 +53,7 @@
                 session  (atom (read-session session-key options))
                 request  (assoc request :session session)
                 response (handler request)
-                session-key (write-session @session options)]
-              (assoc response :cookies {cookie session-key})))))))
+                new-session-key (write-session @session options)]
+              (if (not= session-key new-session-key)
+                (assoc response :cookies {cookie new-session-key})
+                response)))))))
