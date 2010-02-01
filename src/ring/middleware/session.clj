@@ -5,10 +5,18 @@
   (:import java.util.UUID))
 
 (defn wrap-session
-  "Uses the read-session multimethod to read in a session map, wraps it in an
-  atom, then adds it to the :session key of the request map. After the handler
-  function has completed, the modified session atom is stored using the
-  write-session multimethod."
+  "Creates an atom to hold a mutable session map, and adds this to the
+  :session key on the request map. Any changes made to the map will be
+  persisted when the handler ends.
+
+  The following options are available:
+    :store
+      An implementation map containing :read, :write, and :delete
+      keys. This determines how the session is stored. Defaults to
+      in-memory storage.
+    :cookie-name
+      The name of the cookie that holds the session key. Defaults to
+      \"ring-session\""
   ([handler]
     (wrap-session handler {}))
   ([handler options]
