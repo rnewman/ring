@@ -1,4 +1,4 @@
-(defproject org.clojars.rnewman/ring "0.2.1-sessions"
+(defproject org.clojars.rnewman/ring "0.2.2-sessions"
   :description "A Clojure web applications library."
   :url "http://github.com/mmcgrana/ring"
   :dependencies [[org.clojure/clojure "1.2.0-master-SNAPSHOT"]
